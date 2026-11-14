@@ -1,0 +1,104 @@
+// .devcontainer/devcontainer.json
+// Java 25 + Maven backend, Node frontend, Python for scripts, Terraform/AWS,
+// Claude Code + Codex, set up for JetBrains Gateway (IntelliJ IDEA backend).
+{
+  "name": "java25-fullstack-agents",
+
+  // Plain Ubuntu base; every toolchain comes from features below so versions are explicit.
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  // Codespaces will only offer machine types that meet this. IntelliJ backend +
+  // app JVM + test JVMs + Node + an agent needs real headroom.
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "16gb",
+    "storage": "32gb"
+  },
+
+  "features": {
+    // Required for JetBrains Gateway to connect.
+    "ghcr.io/devcontainers/features/sshd:1": {},
+
+    // GitHub CLI (useful for `gh codespace ssh --config` fallback and general use).
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+
+    // OpenJDK 25 (Eclipse Temurin) + Maven.
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "25",
+      "jdkDistro": "tem",
+      "installMaven": "true",
+      "installGradle": "false"
+    },
+
+    // Node LTS for the frontend (also needed by Codex, installed via npm).
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+
+    // Distro Python only — fast to install, fine for occasional scripts.
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "os-provided"
+    },
+
+    // Terraform + AWS CLI for provisioning.
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+
+    // Claude Code CLI.
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+
+    // Uncomment if you use Testcontainers / Docker Compose in tests (costs RAM):
+    // , "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  // Make sure Node exists before the Claude Code feature runs.
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/anthropics/devcontainer-features/claude-code"
+  ],
+
+  // Codex via npm, then print versions so a broken toolchain is obvious in the creation log.
+  "postCreateCommand": "npm install -g @openai/codex && java -version && mvn -v && node -v && terraform -version && claude --version && codex --version",
+
+  // Ports for the backend API and a Vite-style frontend dev server. Adjust to your stack.
+  "forwardPorts": [8080, 5173],
+  "portsAttributes": {
+    "8080": { "label": "Backend (Spring/Java)" },
+    "5173": { "label": "Frontend dev server" }
+  },
+
+  // Codespaces prompts for these at creation time; values come from your
+  // GitHub Codespaces secrets. Set only the ones you actually use.
+  "secrets": {
+    "ANTHROPIC_API_KEY": {
+      "description": "Anthropic API key for Claude Code (omit if logging in with a Claude subscription)."
+    },
+    "OPENAI_API_KEY": {
+      "description": "OpenAI API key for Codex (omit if logging in with a ChatGPT account)."
+    },
+    "AWS_ACCESS_KEY_ID": {
+      "description": "AWS credentials for Terraform. Prefer a narrowly scoped IAM user/role."
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "description": "AWS credentials for Terraform."
+    },
+    "AWS_DEFAULT_REGION": {
+      "description": "Default AWS region, e.g. us-east-1."
+    }
+  },
+
+  "customizations": {
+    "jetbrains": {
+      // Default backend Gateway launches. WebStorm/PyCharm can still be picked at connect time.
+      "backend": "IntelliJ",
+      "plugins": [
+        "com.anthropic.code.plugin",  // Claude Code [Beta] — must live on the host/backend
+        "org.intellij.plugins.hcl"    // Terraform/HCL (harmless if already bundled)
+      ]
+    }
+  },
+
+  "remoteUser": "vscode"
+}
