@@ -70,14 +70,10 @@
   },
 
   // Codespaces prompts for these at creation time; values come from your
-  // GitHub Codespaces secrets. Set only the ones you actually use.
+  // GitHub Codespaces secrets. Claude Code and Codex sign in with your
+  // Claude/ChatGPT subscriptions instead of API keys — do NOT add
+  // ANTHROPIC_API_KEY or OPENAI_API_KEY here, or usage bills per token.
   "secrets": {
-    "ANTHROPIC_API_KEY": {
-      "description": "Anthropic API key for Claude Code (omit if logging in with a Claude subscription)."
-    },
-    "OPENAI_API_KEY": {
-      "description": "OpenAI API key for Codex (omit if logging in with a ChatGPT account)."
-    },
     "AWS_ACCESS_KEY_ID": {
       "description": "AWS credentials for Terraform. Prefer a narrowly scoped IAM user/role."
     },
