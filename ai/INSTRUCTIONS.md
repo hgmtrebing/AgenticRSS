@@ -1,3 +1,14 @@
+## Overview
+
+This project is to create an RSS Aggregator Server, which aggregates RSS feeds and makes them available for RSS Clients. Some essential features:
+    - API so that AI Agents can read and write from the service. This will become more important as development continues - AI will ultimately be a critical component on top of the vanilla RSS Server.
+    - Ability to create RSS feeds by scraping websites
+    - UI to administer the server and view RSS feeds
+    - API so that other RSS clients can read from the server
+
+## Technology Stack
+
+The backend server will be coded in Java / Spring Boot. The attached database will be Postgres. The UI should be coded in React and served from the database. The API should be coded in Swagger / Open API.
 
 ## Coding Style
 
